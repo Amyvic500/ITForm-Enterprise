@@ -6,7 +6,22 @@ define('BASE_PATH', dirname(dirname(__FILE__)));
 define('VIEW_PATH', BASE_PATH . '/views');
 define('BASE_URL', 'http://localhost/itform');
 
-require_once BASE_PATH . '/vendor/autoload.php';
+// Manual autoloader
+spl_autoload_register(function($class) {
+    $prefix = 'App\\';
+    $len = strlen($prefix);
+    
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+    
+    $relative_class = substr($class, $len);
+    $file = BASE_PATH . '/src/' . str_replace('\\', '/', $relative_class) . '.php';
+    
+    if (file_exists($file)) {
+        require $file;
+    }
+});
 
 use App\Utils\Router;
 use App\Controllers\AuthController;
@@ -32,8 +47,6 @@ $router->get('/itform/requests/my-requests', RequestController::class, 'myReques
 $router->get('/itform/approvals/pending', ApprovalController::class, 'pending');
 $router->post('/itform/approvals/approve', ApprovalController::class, 'approve');
 $router->post('/itform/approvals/reject', ApprovalController::class, 'reject');
-$router->post('/itform/approvals/escalate', ApprovalController::class, 'escalate');
-$router->get('/itform/approvals/history', ApprovalController::class, 'history');
 
 // Dashboard routes
 $router->get('/itform/dashboard', DashboardController::class, 'index');
@@ -41,10 +54,7 @@ $router->get('/itform/dashboard/stats', DashboardController::class, 'getStats');
 
 // Admin routes
 $router->get('/itform/admin/users', AdminController::class, 'users');
-$router->get('/itform/admin/user', AdminController::class, 'getUser');
 $router->post('/itform/admin/user/update', AdminController::class, 'updateUser');
-$router->post('/itform/admin/user/deactivate', AdminController::class, 'deactivateUser');
-$router->post('/itform/admin/settings', AdminController::class, 'updateSettings');
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

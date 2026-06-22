@@ -27,31 +27,4 @@ class Database
         }
         return self::$instance->connection;
     }
-
-    public function fetchOne($query, $params = [])
-    {
-        $stmt = $this->connection->prepare($query);
-        $stmt->execute($params);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
-    }
-
-    public function fetch($query, $params = [])
-    {
-        $stmt = $this->connection->prepare($query);
-        $stmt->execute($params);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
-    public function execute($query, $params = [])
-    {
-        $stmt = $this->connection->prepare($query);
-        return $stmt->execute($params);
-    }
-
-    public function insert($query, $params = [])
-    {
-        $stmt = $this->connection->prepare($query);
-        $stmt->execute($params);
-        return $this->connection->lastInsertId();
-    }
 }
