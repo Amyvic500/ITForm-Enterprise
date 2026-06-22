@@ -2,7 +2,7 @@
 
 ## Overview
 
-ITForm Enterprise is an IT request and approval management system built for Prime Bisco Nigeria Limited. It supports multi-application requests, configurable approval workflows, role-based access, notifications, and audit tracking.
+ITForm Enterprise is an IT request and approval management system built for IT Department internal request. It supports multi-application requests, configurable approval workflows, role-based access, notifications, and audit tracking.
 
 **Version:** 1.0.0
 **Technology:** PHP 7.1+, SQL Server / MySQL, HTML/CSS/JavaScript
