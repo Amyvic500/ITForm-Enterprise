@@ -67,6 +67,6 @@ If you encounter issues:
 
 ## License & Credits
 
-Published for Prime Bisco Nigeria Limited.
+Published for IT Department Internal Request.
 
 For complete installation and usage details, see the files in the docs/ directory.
