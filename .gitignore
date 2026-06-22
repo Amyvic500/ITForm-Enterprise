@@ -1,0 +1,19 @@
+﻿# Environment Variables
+.env
+.env.local
+# IDE
+.vscode/
+.idea/
+*.swp
+# Storage (local files)
+storage/logs/*
+storage/cache/*
+storage/sessions/*
+storage/temp/*
+storage/uploads/*
+# OS
+.DS_Store
+Thumbs.db
+# Composer
+vendor/
+composer.lock
