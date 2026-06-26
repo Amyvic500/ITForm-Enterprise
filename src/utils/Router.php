@@ -1,5 +1,5 @@
-﻿<?php
-namespace App\Utils;
+<?php
+namespace App\utils;
 
 class Router
 {
@@ -47,3 +47,4 @@ class Router
         $controller->$method();
     }
 }
+?>

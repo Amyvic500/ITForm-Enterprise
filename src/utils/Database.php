@@ -1,30 +1,65 @@
-﻿<?php
-namespace App\Utils;
+<?php
+namespace App\utils;
 
 class Database
 {
-    protected static $instance = null;
-    protected $connection;
+    private $connection;
 
-    private function __construct()
+    public function __construct()
+    {
+        $this->connect();
+    }
+
+    private function connect()
     {
         try {
+            $host = 'IT-VICTORIA\SQLEXPRESS';
+            $database = 'ITForm_DB';
+            $username = 'itform_user';
+            $password = 'ITForm@2026';
+
+            $dsn = "sqlsrv:Server=" . $host . ";Database=" . $database;
+            
             $this->connection = new \PDO(
-                'sqlsrv:Server=IT-VICTORIA\SQLEXPRESS;Database=ITForm_DB',
-                'itform_user',
-                'ITFORMdb2026@'
+                $dsn,
+                $username,
+                $password,
+                array(
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
+                )
             );
-            $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
-            die('Database connection failed: ' . $e->getMessage());
+            die("Database Connection Failed: " . $e->getMessage());
         }
     }
 
-    public static function getInstance()
+    public function getConnection()
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
+        return $this->connection;
+    }
+
+    public function query($sql, $params = [])
+    {
+        try {
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (\PDOException $e) {
+            die("Query Error: " . $e->getMessage());
         }
-        return self::$instance->connection;
+    }
+
+    public function select($sql, $params = [])
+    {
+        $stmt = $this->query($sql, $params);
+        return $stmt->fetchAll();
+    }
+
+    public function selectOne($sql, $params = [])
+    {
+        $stmt = $this->query($sql, $params);
+        return $stmt->fetch();
     }
 }
+?>

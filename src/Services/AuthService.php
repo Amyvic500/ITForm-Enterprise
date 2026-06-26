@@ -1,11 +1,11 @@
-﻿<?php
+<?php
 namespace App\Services;
 
 use App\Models\UserModel;
 
 class AuthService
 {
-    protected $userModel;
+    private $userModel;
 
     public function __construct()
     {
@@ -14,18 +14,31 @@ class AuthService
 
     public function authenticate($email, $password)
     {
-        $user = $this->userModel->findByEmail($email);
+        $user = $this->userModel->getUserByEmail($email);
+        
         if (!$user) {
-            return ['success' => false];
+            return ['success' => false, 'message' => 'User not found'];
         }
-        if (!password_verify($password, $user['password_hash'])) {
-            return ['success' => false];
+
+        if (!$user['is_active']) {
+            return ['success' => false, 'message' => 'Account is inactive'];
         }
+
+        // Hash the provided password and compare
+        $hash = hash('sha256', $password);
+        $storedHash = strtolower($user['password_hash']);
+
+        if ($hash !== $storedHash) {
+            return ['success' => false, 'message' => 'Invalid password'];
+        }
+
         return ['success' => true, 'user' => $user];
     }
 
     public function updateLastLogin($userId)
     {
-        return $this->userModel->updateLastLogin($userId, date('Y-m-d H:i:s'));
+        $sql = "UPDATE tbl_users SET last_login = GETDATE() WHERE user_id = ?";
+        // Execute query
     }
 }
+?>

@@ -1,58 +1,29 @@
-﻿<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-define('BASE_PATH', dirname(__FILE__));
-define('VIEW_PATH', BASE_PATH . '/views');
-define('BASE_URL', 'http://localhost/itform');
-
-// Load .env file
-if (file_exists(BASE_PATH . '/.env')) {
-    $lines = file(BASE_PATH . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
-            [$key, $value] = explode('=', $line, 2);
-            $_ENV[trim($key)] = trim($value);
-        }
-    }
-}
-
-// Helper functions
-if (!function_exists('env')) {
-    function env($key, $default = null) {
-        return $_ENV[$key] ?? getenv($key) ?? $default;
-    }
-}
-
-if (!function_exists('storage_path')) {
-    function storage_path($path = '') {
-        $base = BASE_PATH . '/storage';
-        return $path ? $base . '/' . $path : $base;
-    }
-}
-
-// Manual autoloader
-spl_autoload_register(function($class) {
-    $prefix = 'App\\';
-    $len = strlen($prefix);
-    
-    if (strncmp($prefix, $class, $len) !== 0) {
-        return;
-    }
-    
-    $relative_class = substr($class, $len);
-    $file = BASE_PATH . '/src/' . str_replace('\\', '/', $relative_class) . '.php';
-    
-    if (file_exists($file)) {
-        require $file;
-    }
-});
-
-use App\Utils\Router;
+use App\utils\Router;
 use App\Controllers\AuthController;
+use App\Controllers\DashboardController;
+use App\Controllers\RequestController;
+use App\Controllers\ApprovalController;
+use App\Controllers\PublicController;
 
 $router = new Router();
-$router->post('/itform/auth/login', AuthController::class, 'login');
+
+// Public routes (no login required)
+$router->get('/itform/', PublicController::class, 'requestForm');
+$router->get('/itform', PublicController::class, 'requestForm');
+$router->post('/itform/requests/submit', PublicController::class, 'createRequest');
+
+// Admin auth routes
+$router->get('/itform/admin/login', AuthController::class, 'loginForm');
+$router->post('/itform/admin/login', AuthController::class, 'login');
+$router->get('/itform/admin/logout', AuthController::class, 'logout');
+
+// Admin dashboard routes (login required)
+$router->get('/itform/dashboard', DashboardController::class, 'index');
+$router->get('/itform/requests', RequestController::class, 'list');
+$router->post('/itform/requests', RequestController::class, 'create');
+$router->get('/itform/requests/create', RequestController::class, 'createForm');
+$router->get('/itform/approvals', ApprovalController::class, 'pending');
+$router->post('/itform/approvals', ApprovalController::class, 'approve');
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestPath = $_GET['url'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

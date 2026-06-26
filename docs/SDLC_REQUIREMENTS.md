@@ -1,7 +1,7 @@
 # ITForm Enterprise Application - Complete SDLC Documentation
 
 ## Executive Summary
-ITForm is an enterprise-level IT Request Management System designed for Prime Bisco Nigeria Limited. The application manages complex approval workflows, multi-app requests, role-based access, and comprehensive audit trails.
+ITForm is an enterprise-level IT Request Management System designed for IT Department Internal Request. The application manages complex approval workflows, multi-app requests, role-based access, and comprehensive audit trails.
 
 ---
 

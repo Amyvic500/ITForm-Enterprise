@@ -1,25 +1,33 @@
-﻿<?php
+<?php
 namespace App\Models;
+
+use App\utils\Database;
 
 class UserModel
 {
-    protected $db;
+    private $db;
 
     public function __construct()
     {
-        $this->db = new \PDO('sqlsrv:Server=IT-VICTORIA\SQLEXPRESS;Database=ITForm_DB', 'itform_user', 'ITFORMdb2026@');
+        $this->db = new Database();
     }
 
-    public function findByEmail($email)
+    public function getUserByEmail($email)
     {
-        $stmt = $this->db->prepare("SELECT * FROM tbl_users WHERE email = ?");
-        $stmt->execute([$email]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $sql = "SELECT * FROM tbl_users WHERE email = ?";
+        return $this->db->selectOne($sql, [$email]);
     }
 
-    public function updateLastLogin($userId, $timestamp)
+    public function getUserById($id)
     {
-        $stmt = $this->db->prepare("UPDATE tbl_users SET last_login = ? WHERE user_id = ?");
-        return $stmt->execute([$timestamp, $userId]);
+        $sql = "SELECT * FROM tbl_users WHERE id = ?";
+        return $this->db->selectOne($sql, [$id]);
+    }
+
+    public function getAllUsers()
+    {
+        $sql = "SELECT * FROM tbl_users";
+        return $this->db->select($sql);
     }
 }
+?>

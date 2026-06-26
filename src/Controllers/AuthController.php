@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace App\Controllers;
 
 use App\Services\AuthService;
@@ -13,40 +13,44 @@ class AuthController extends BaseController
         $this->authService = new AuthService();
     }
 
+    public function loginForm()
+    {
+        include BASE_PATH . '/views/auth/login.php';
+    }
+
     public function login()
     {
         if ($this->requestMethod !== 'POST') {
             $this->respondWithError(405, 'Method not allowed');
+            return;
         }
 
         $email = $this->sanitize($this->getParam('email'));
         $password = $this->getParam('password');
-        $this->validateRequired(['email', 'password']);
 
-        if (!$this->validateEmail($email)) {
-            $this->respondWithError(400, 'Invalid email');
+        if (!$email || !$password) {
+            $this->respondWithError(400, 'Email and password required');
+            return;
         }
 
         $result = $this->authService->authenticate($email, $password);
-
+        
         if (!$result['success']) {
-            $this->respondWithError(401, 'Invalid credentials');
+            $this->respondWithError(401, $result['message']);
+            return;
         }
 
-        $user = $result['user'];
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['user_email'] = $user['email'];
-        $_SESSION['user_full_name'] = $user['full_name'];
+        $_SESSION['user_id'] = $result['user']['user_id'];
+        $_SESSION['user_email'] = $result['user']['email'];
+        $_SESSION['user_full_name'] = $result['user']['full_name'];
 
-        $this->authService->updateLastLogin($user['user_id']);
-
-        $this->respondSuccess(['message' => 'Login successful', 'user' => $user]);
+        $this->respondSuccess(['message' => 'Login successful', 'user' => $result['user']]);
     }
 
     public function logout()
     {
-        $this->requireAuth();
         session_destroy();
         $this->respondSuccess(['message' => 'Logged out']);
     }
 }
+?>
